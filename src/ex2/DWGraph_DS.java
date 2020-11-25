@@ -2,13 +2,19 @@ package ex2;
 
 import api.*;
 
+import java.awt.*;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 public class DWGraph_DS implements directed_weighted_graph {
+    private HashMap<Integer, node_data> graph = new HashMap<Integer,node_data>();
+    private int edgeCounter;
+    private int modeCounter;
     @Override
     public node_data getNode(int key) {
-        return null;
+        return graph.get(key);
     }
 
     @Override
@@ -18,21 +24,36 @@ public class DWGraph_DS implements directed_weighted_graph {
 
     @Override
     public void addNode(node_data n) {
-
+        if(graph.containsKey(n.getKey()))return;
+        modeCounter++;
+        graph.put(n.getKey(),n);
     }
 
     @Override
     public void connect(int src, int dest, double w) {
-
+        if (graph.get(src) == null || graph.get(dest) == null) return;
+        if (src == dest) return;
+        //if(hasEdge(src, dest))return;
+        if (graph.containsKey(src) && graph.containsKey(dest)) {
+            modeCounter++;
+            edgeCounter++;
+              ((nodedata) graph.get(src)).addNi(graph.get(dest),w);
+        }
     }
 
     @Override
     public Collection<node_data> getV() {
-        return null;
+        return graph.values();
     }
 
     @Override
     public Collection<edge_data> getE(int node_id) {
+        // todo
+        if(!graph.containsKey(node_id))
+            return null;
+        HashMap<Integer,Double> temp = ((nodedata) graph.get(node_id)).getNi();
+        List<node_data> coll = new ArrayList<node_data>();
+        temp.forEach((k,v) ->coll.add(graph.get(k)));
         return null;
     }
 
@@ -48,17 +69,17 @@ public class DWGraph_DS implements directed_weighted_graph {
 
     @Override
     public int nodeSize() {
-        return 0;
+        return graph.size();
     }
 
     @Override
     public int edgeSize() {
-        return 0;
+        return edgeCounter;
     }
 
     @Override
     public int getMC() {
-        return 0;
+        return modeCounter;
     }
 
     public static class nodedata implements node_data {
@@ -69,7 +90,41 @@ public class DWGraph_DS implements directed_weighted_graph {
         private double Weight;
         private geo_location Location;
         private HashMap<Integer, Double> weighted_neighbors = new HashMap<Integer, Double>();
+        public nodedata() {
+            this.Info="empty";
+            Key=CounterForKey;
+            CounterForKey++;
+            Tag=0;
+        }
+        public nodedata(String Info,int tag) {
+            this.Info=Info;
+            Key=CounterForKey;
+            CounterForKey++;
+            this.Tag=tag;
+        }
+        public nodedata(int key,String Info,int tag) {
+            this.Info=Info;
+            this.Key=key;
+            this.Tag=tag;
+        }
+        public nodedata(int key) {
+            this.Info="empty";
+            this.Key=key;
+            this.Tag=0;
+        }
 
+        public boolean hasNi(int key) {
+            return (weighted_neighbors.containsKey(key) && key != this.getKey());
+        }
+        public void addNi(node_data t, double w) {
+            if(t!=null)
+                if(!weighted_neighbors.containsKey(t.getKey()))
+                    if(t.getKey()!=this.Key)
+                        weighted_neighbors.put(t.getKey(), w);
+        }
+        public HashMap<Integer, Double> getNi() {
+            return weighted_neighbors;
+        }
         @Override
         public int getKey() {
             return Key;
@@ -92,6 +147,7 @@ public class DWGraph_DS implements directed_weighted_graph {
 
         @Override
         public void setWeight(double w) {
+            if(w>0)
             Weight = w;
         }
 
