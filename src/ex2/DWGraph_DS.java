@@ -2,7 +2,6 @@ package ex2;
 
 import api.*;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -48,22 +47,35 @@ public class DWGraph_DS implements directed_weighted_graph {
 
     @Override
     public Collection<edge_data> getE(int node_id) {
-        // todo
         if(!graph.containsKey(node_id))
             return null;
-        HashMap<Integer,Double> temp = ((nodedata) graph.get(node_id)).getNi();
-        List<node_data> coll = new ArrayList<node_data>();
-        temp.forEach((k,v) ->coll.add(graph.get(k)));
-        return null;
+        HashMap<Integer,edge_data> temp = ((nodedata) graph.get(node_id)).getNi();
+        return temp.values();
     }
 
     @Override
     public node_data removeNode(int key) {
+        if(graph.get(key)!=null)
+            if(graph.containsKey(key)) {
+                edgeCounter-=((nodedata) graph.get(key)).getNi().size();
+                modeCounter+=((nodedata) graph.get(key)).getNi().size()+1;
+                HashMap<Integer,edge_data> temp = ((nodedata) graph.get(key)).getNi();
+                temp.forEach((k,v) ->((nodedata) graph.get(k)).removeNode(graph.get(key)));
+                ((nodedata) graph.get(key)).getNi().clear();
+                return graph.remove(key);
+            }
         return null;
     }
 
     @Override
     public edge_data removeEdge(int src, int dest) {
+        if(graph.get(src)!=null&&graph.get(dest)!=null)
+            if(graph.containsKey(src)&&graph.containsKey(dest)) {
+                edgeCounter--;
+                modeCounter++;
+                edge_data temp = ((nodedata) graph.get(src)).getNi().remove(dest);
+                return temp;
+            }
         return null;
     }
 
@@ -89,7 +101,7 @@ public class DWGraph_DS implements directed_weighted_graph {
         private int Tag;
         private double Weight;
         private geo_location Location;
-        private HashMap<Integer, Double> weighted_neighbors = new HashMap<Integer, Double>();
+        private  HashMap<Integer,edge_data> edgeinfo;
         public nodedata() {
             this.Info="empty";
             Key=CounterForKey;
@@ -114,16 +126,26 @@ public class DWGraph_DS implements directed_weighted_graph {
         }
 
         public boolean hasNi(int key) {
-            return (weighted_neighbors.containsKey(key) && key != this.getKey());
+            return (edgeinfo.containsKey(key) && key != this.getKey());
         }
         public void addNi(node_data t, double w) {
             if(t!=null)
-                if(!weighted_neighbors.containsKey(t.getKey()))
-                    if(t.getKey()!=this.Key)
-                        weighted_neighbors.put(t.getKey(), w);
+                if(!edgeinfo.containsKey(t.getKey()))
+                    if(t.getKey()!=this.Key) {
+                         edgedata temp= new edgedata(this.Key,t.getKey(),w);
+                        edgeinfo.put(t.getKey(), temp);
+                    }
         }
-        public HashMap<Integer, Double> getNi() {
-            return weighted_neighbors;
+        public HashMap<Integer, edge_data> getNi() {
+            return edgeinfo;
+        }
+        public void removeNode(node_data node) {
+            if(node!=null)
+                if(edgeinfo.containsKey(node.getKey()))
+                    if(node.getKey()!=this.Key) {
+                      edgeinfo.remove(node.getKey());
+                    }
+
         }
         @Override
         public int getKey() {
@@ -170,6 +192,8 @@ public class DWGraph_DS implements directed_weighted_graph {
         public void setTag(int t) {
             Tag = t;
         }
+
+
     }
 
     public class geolocation implements geo_location {
@@ -189,23 +213,33 @@ public class DWGraph_DS implements directed_weighted_graph {
 
         @Override
         public double z() {
-            return x;
+            return z;
         }
 
         @Override
         public double distance(geo_location g) {
             double dis = Math.pow(x - g.x(), 2) + Math.pow(y - g.y(), 2) + Math.pow(z - g.z(), 2);
-            dis = Math.pow(dis, 0.5);
+            dis = Math.sqrt(dis);
             return dis;
         }
     }
 
-    public class edgedata implements edge_data {
+    public static class edgedata implements edge_data {
         private int Src;
         private int Dest;
         private double Weight;
         private String Info;
         private int Tag;
+
+        public edgedata(int src,int dest,double w){
+            //todo info,tag setup
+            this.Src=src;
+            this.Dest=dest;
+            this.Weight=w;
+            Info="";
+            Tag=-1;
+        }
+
 
         @Override
         public int getSrc() {
