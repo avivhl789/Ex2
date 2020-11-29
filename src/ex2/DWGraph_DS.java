@@ -18,7 +18,8 @@ public class DWGraph_DS implements directed_weighted_graph {
 
     @Override
     public edge_data getEdge(int src, int dest) {
-        return null;
+        HashMap<Integer,edge_data> temp = ((nodedata) graph.get(src)).getNi();
+        return temp.get(dest);
     }
 
     @Override
