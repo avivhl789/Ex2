@@ -114,16 +114,20 @@ public class DWGraph_DS implements directed_weighted_graph {
             Key=CounterForKey;
             CounterForKey++;
             this.Tag=tag;
+            Location=new geolocation();
         }
         public nodedata(int key,String Info,int tag) {
             this.Info=Info;
             this.Key=key;
             this.Tag=tag;
+            Location=new geolocation();
+
         }
         public nodedata(int key) {
             this.Info="empty";
             this.Key=key;
             this.Tag=0;
+            Location=new geolocation();
         }
 
         public boolean hasNi(int key) {
@@ -197,10 +201,20 @@ public class DWGraph_DS implements directed_weighted_graph {
 
     }
 
-    public class geolocation implements geo_location {
+    public static class geolocation implements geo_location {
         private double x;
         private double y;
         private double z;
+        public geolocation(double x,double y,double z){
+            this.x=x;
+            this.y=y;
+            this.z=z;
+        }
+        public geolocation(){
+            this.x=0;
+            this.y=0;
+            this.z=0;
+        }
 
         @Override
         public double x() {
