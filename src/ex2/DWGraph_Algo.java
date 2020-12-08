@@ -4,7 +4,13 @@ import api.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
+import org.json.JSONStringer;
 
+
+
+
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.*;
 
@@ -23,11 +29,10 @@ public class DWGraph_Algo implements dw_graph_algorithms {
 
     @Override
     public directed_weighted_graph copy() {
-        //todo
         directed_weighted_graph temp = new DWGraph_DS();
         HashMap<Integer, Integer> keymaching = new HashMap<Integer, Integer>();
         for (node_data node : this.gr.getV()) {
-            DWGraph_DS.nodedata tempnode = new DWGraph_DS.nodedata("", 0);
+            nodedata tempnode = new nodedata("", 0);
             temp.addNode(tempnode);
             keymaching.put(node.getKey(), tempnode.getKey());
 
@@ -54,7 +59,7 @@ public class DWGraph_Algo implements dw_graph_algorithms {
         queue.add(N);
         while (!queue.isEmpty()) {
             N = queue.remove();
-            HashMap<Integer, edge_data> temp = ((DWGraph_DS.nodedata) gr.getNode(N.getKey())).getNi();
+            HashMap<Integer, edge_data> temp = ((nodedata) gr.getNode(N.getKey())).getNi();
             for (Integer keyofnei : temp.keySet()) {
                 ni = gr.getNode(keyofnei);
                 if (ni.getTag() == -1) {
@@ -77,7 +82,6 @@ public class DWGraph_Algo implements dw_graph_algorithms {
             if (gr.getEdge(src, dest) != null)
                 return gr.getEdge(src, dest).getWeight();
         }
-        reset_tag();
         HashMap<Integer, Double> costpath = new HashMap<Integer, Double>();
         PriorityQueue<node_data> queue = new PriorityQueue<node_data>((Comparator<node_data>) new Comparator<node_data>() {
             @Override
@@ -92,15 +96,14 @@ public class DWGraph_Algo implements dw_graph_algorithms {
         );
         node_data N = this.gr.getNode(src);
         node_data ni;
-        N.setTag(0);
         queue.add(N);
         double cost = Double.MAX_VALUE;
         while (!queue.isEmpty()) {
             N = queue.remove();
-            HashMap<Integer, edge_data> temp = ((DWGraph_DS.nodedata) gr.getNode(N.getKey())).getNi();
+            HashMap<Integer, edge_data> temp = ((nodedata) gr.getNode(N.getKey())).getNi();
             for (Integer keyofnei : temp.keySet()) {
                 ni = gr.getNode(keyofnei);
-                if (ni.getTag() == -1) {
+                if (costpath.containsKey(ni.getKey())) {
                     costpath.put(ni.getKey(), costpath.get(N.getKey()) + temp.get(keyofnei).getWeight());
                     ni.setTag(1);
                     queue.add(ni);
@@ -129,7 +132,6 @@ public class DWGraph_Algo implements dw_graph_algorithms {
             path.add(gr.getNode(dest));
             return path;
         }
-        reset_tag();
         HashMap<Integer, Double> costpath = new HashMap<Integer, Double>();
         HashMap<Integer, Integer> mappath = new HashMap<Integer, Integer>();
         PriorityQueue<node_data> queue = new PriorityQueue<node_data>((Comparator<node_data>) new Comparator<node_data>() {
@@ -145,15 +147,14 @@ public class DWGraph_Algo implements dw_graph_algorithms {
         );
         node_data N = this.gr.getNode(src);
         node_data ni;
-        N.setTag(0);
         queue.add(N);
         boolean flag = false;
         while (!queue.isEmpty()) {
             N = queue.remove();
-            HashMap<Integer, edge_data> temp = ((DWGraph_DS.nodedata) gr.getNode(N.getKey())).getNi();
+            HashMap<Integer, edge_data> temp = ((nodedata) gr.getNode(N.getKey())).getNi();
             for (Integer keyofnei : temp.keySet()) {
                 ni = gr.getNode(keyofnei);
-                if (ni.getTag() == -1) {
+                if (costpath.containsKey(ni.getKey())) {
                     costpath.put(ni.getKey(), costpath.get(N.getKey()) + temp.get(keyofnei).getWeight());
                     ni.setTag(1);
                     queue.add(ni);
@@ -202,7 +203,7 @@ public class DWGraph_Algo implements dw_graph_algorithms {
                 obj.put("id", correctnode.getKey());
                 nodesdata.put(obj);
                 obj = new JSONObject();
-                HashMap<Integer, edge_data> egdelist = ((DWGraph_DS.nodedata) gr.getNode(correctnode.getKey())).getNi();
+                HashMap<Integer, edge_data> egdelist = ((nodedata) gr.getNode(correctnode.getKey())).getNi();
                 for (Integer keyofnei : egdelist.keySet()) {
                     obj.put("src", correctnode.getKey());
                     obj.put("w", egdelist.get(keyofnei));
@@ -219,8 +220,7 @@ public class DWGraph_Algo implements dw_graph_algorithms {
         try {
             alldata.put("Edges", egdedata);
             alldata.put("Nodes", nodesdata);
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
             return false;
 
@@ -239,7 +239,50 @@ public class DWGraph_Algo implements dw_graph_algorithms {
 
     @Override
     public boolean load(String file) {
-        return false;
+        try (FileReader reader = new FileReader(file)) {
+            JSONArray data = new JSONArray(reader);
+            System.out.println(data);
+            System.out.println(data.toString());
+//            data.get();
+           /*if(filein.hasNextLine()) {
+               line=filein.nextLine();
+               int last=line.indexOf("pos")+2;
+               int next=line.indexOf(",",last);
+               while (filein.hasNextLine()) {
+                   while(next!=-1&&last!=-1) {
+                       posx.add(Double.parseDouble(line.substring(last+1, next)));
+                       last=next;
+                       next=line.indexOf(",",last+1);
+                       posy.add(Double.parseDouble(line.substring(last+1, next)));
+                       last=next;
+                       next=line.indexOf(",",last+1);
+                       posz.add(Double.parseDouble(line.substring(last+1, next)));
+                       last=line.indexOf("id",next)+2;
+                       next=line.indexOf("}",last);
+                       keys.add(Integer.parseInt(line.substring(last+1,next)));
+                       last=line.indexOf("pos",next)+2;
+                       next=line.indexOf(",",last);
+                   }
+                   last=line.indexOf("src")+2;
+                   next=line.indexOf(",",last);
+                   int src;
+                   int dest;
+                   double w;
+                   while(next!=-1&&last!=-1) {
+                   src=Integer.parseInt(line.substring(last+1,next));
+                   w=Double.parseDouble(line.substring(last+1, next));
+                    dest=Integer.parseInt(line.substring(last+1,next));
+                       temp.cocncet(
+                   }
+
+                   */
+
+
+            return true;
+        } catch (Exception e) {
+            System.out.println(e);
+            return false;
+        }
     }
 
     private void reset_tag() {
@@ -250,4 +293,13 @@ public class DWGraph_Algo implements dw_graph_algorithms {
             node.setTag(-1);
         }
     }
+    public static void main(String[]args)
+    {
+        DWGraph_Algo algo=new DWGraph_Algo();
+        DWGraph_DS graph=new DWGraph_DS();
+        algo.init(graph);
+        boolean successfulLoad=algo.load("C:\\A0");
+        System.out.println(successfulLoad);
+    }
+
 }
