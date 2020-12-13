@@ -19,6 +19,9 @@ public  class nodedata implements node_data {
         Key=CounterForKey;
         CounterForKey++;
         Tag=0;
+        edgeinfo = new HashMap<>();
+        Location = new geolocation();
+
     }
     public nodedata(String Info,int tag) {
         this.Info=Info;
@@ -26,19 +29,22 @@ public  class nodedata implements node_data {
         CounterForKey++;
         this.Tag=tag;
         Location=new geolocation();
+        edgeinfo = new HashMap<>();
+
     }
     public nodedata(int key,String Info,int tag) {
         this.Info=Info;
         this.Key=key;
         this.Tag=tag;
         Location=new geolocation();
-
+        edgeinfo = new HashMap<>();
     }
     public nodedata(int key) {
         this.Info="empty";
         this.Key=key;
         this.Tag=0;
         Location=new geolocation();
+        edgeinfo = new HashMap<>();
     }
 
     public boolean hasNi(int key) {

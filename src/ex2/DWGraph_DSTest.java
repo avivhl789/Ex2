@@ -1,10 +1,8 @@
 package ex2;
 
 import api.edge_data;
-import api.node_data;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
 class DWGraph_DSTest
 {
@@ -14,9 +12,9 @@ class DWGraph_DSTest
     void setup()
     {
         graph = new DWGraph_DS();
-        DWGraph_DS.nodedata firstNode = new DWGraph_DS.nodedata();
-        DWGraph_DS.nodedata secondNode = new DWGraph_DS.nodedata();
-        DWGraph_DS.nodedata thirdNode = new DWGraph_DS.nodedata();
+        nodedata firstNode = new nodedata();
+        nodedata secondNode = new nodedata();
+        nodedata thirdNode = new nodedata();
         graph.addNode(firstNode);
         graph.addNode(secondNode);
         graph.addNode(thirdNode);
@@ -26,21 +24,19 @@ class DWGraph_DSTest
     @Test
     void getNode()
     {
-        DWGraph_DS.nodedata forthNode = new DWGraph_DS.nodedata();
-        DWGraph_DS.nodedata expectedNode = forthNode;
+        nodedata forthNode = new nodedata();
         graph.addNode(forthNode);
-        DWGraph_DS.nodedata actualNode = (DWGraph_DS.nodedata) graph.getNode(3);
-        assert expectedNode == actualNode;
+        nodedata actualNode = (nodedata) graph.getNode(forthNode.getKey());
+        assert forthNode == actualNode : "actual node is: " +actualNode +" , expected node is: " +forthNode;
     }
 
     @Test
     void getNonExistingNode()
     {
-        DWGraph_DS.nodedata actualNode = (DWGraph_DS.nodedata) graph.getNode(10);
-        DWGraph_DS.nodedata expectedNode = null;
+        nodedata actualNode = (nodedata) graph.getNode(10);
+        nodedata expectedNode = null;
         assert actualNode == expectedNode;
     }
-
 
 
     @Test
@@ -48,13 +44,20 @@ class DWGraph_DSTest
     {
         graph.connect(1,2,15);
         edge_data actualEdgeData = graph.getEdge(1,2);
-        assert actualEdgeData != null : "actual Edge Data: " +actualEdgeData +" , actual Edge Data shoudn't be null";
+        assert actualEdgeData != null : "actual Edge Data: " +actualEdgeData +" , actual Edge Data shouldn't be null";
+    }
+
+    @Test
+    void getNonExistingEdge()
+    {
+        edge_data actualEdgeData = graph.getEdge(1,2);
+        assert actualEdgeData == null : "actual Edge Data: " +actualEdgeData +" , actual Edge Data should be null";
     }
 
     @Test
     void addNewNode()
     {
-        DWGraph_DS.nodedata forthNode = new DWGraph_DS.nodedata();
+        nodedata forthNode = new nodedata();
         graph.addNode(forthNode);
         int actualMC = graph.getMC();
         int expectedMC = 4;
@@ -64,7 +67,7 @@ class DWGraph_DSTest
     @Test
     void addExistingNode()
     {
-        DWGraph_DS.nodedata aSecondFirstNode = new DWGraph_DS.nodedata(1);
+        nodedata aSecondFirstNode = new nodedata(1);
         graph.addNode(aSecondFirstNode);
         int actualMC = graph.getMC();
         int expectedMC = 3;
@@ -108,6 +111,12 @@ class DWGraph_DSTest
     }
 
     @Test
+    void invalidConnectExistingEdge()
+    {
+
+    }
+
+    @Test
     void getE()
     {
     }
@@ -125,15 +134,27 @@ class DWGraph_DSTest
     @Test
     void nodeSize()
     {
+        nodedata forthNode = new nodedata();
+        graph.addNode(forthNode);
+        int expectedNodeSize = 4;
+        int actualNodeSize = graph.nodeSize();
+        assert expectedNodeSize == actualNodeSize;
     }
 
     @Test
     void edgeSize()
     {
+        graph.connect(1,2,15);
+        int expectedEdgeSize = 1;
+        int actualNodeSize = graph.edgeSize();
+        assert actualNodeSize == expectedEdgeSize;
     }
 
     @Test
     void getMC()
     {
+        int expectedMC = 3;
+        int actualMC = graph.getMC();
+        assert  actualMC == expectedMC;
     }
 }

@@ -1,17 +1,17 @@
 package ex2;
 
-import api.*;
+import api.directed_weighted_graph;
+import api.dw_graph_algorithms;
+import api.edge_data;
+import api.node_data;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONTokener;
-import org.json.JSONStringer;
-
-
-
 
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 public class DWGraph_Algo implements dw_graph_algorithms {
@@ -199,14 +199,21 @@ public class DWGraph_Algo implements dw_graph_algorithms {
             node_data correctnode = temp.next();
             JSONObject obj = new JSONObject();
             try {
-                obj.put("pos", correctnode.getLocation());
+                StringBuilder pos= new StringBuilder();
+                pos.append(correctnode.getLocation().x());
+                pos.append(",");
+                pos.append(correctnode.getLocation().y());
+                pos.append(",");
+                pos.append(correctnode.getLocation().z());
+
+                obj.put("pos",pos.toString());
                 obj.put("id", correctnode.getKey());
                 nodesdata.put(obj);
                 obj = new JSONObject();
                 HashMap<Integer, edge_data> egdelist = ((nodedata) gr.getNode(correctnode.getKey())).getNi();
                 for (Integer keyofnei : egdelist.keySet()) {
                     obj.put("src", correctnode.getKey());
-                    obj.put("w", egdelist.get(keyofnei));
+                    obj.put("w", egdelist.get(keyofnei).getWeight());
                     obj.put("dest", (keyofnei));
                     egdedata.put(obj);
                 }
@@ -240,44 +247,55 @@ public class DWGraph_Algo implements dw_graph_algorithms {
     @Override
     public boolean load(String file) {
         try (FileReader reader = new FileReader(file)) {
-            JSONArray data = new JSONArray(reader);
+            String data = Files.readString(Path.of(file));
             System.out.println(data);
-            System.out.println(data.toString());
-//            data.get();
-           /*if(filein.hasNextLine()) {
-               line=filein.nextLine();
-               int last=line.indexOf("pos")+2;
-               int next=line.indexOf(",",last);
-               while (filein.hasNextLine()) {
+            ArrayList<Double> posx = new ArrayList<Double>();
+            ArrayList<Double> posy = new ArrayList<Double>();
+            ArrayList<Double> posz = new ArrayList<Double>();
+            ArrayList<Integer> keys = new ArrayList<Integer>();
+            DWGraph_DS temp = new DWGraph_DS();
+            if (data != null)
+            {
+               int last=data.indexOf("pos")+5;
+               int next=data.indexOf(",",last);
                    while(next!=-1&&last!=-1) {
-                       posx.add(Double.parseDouble(line.substring(last+1, next)));
+                       posx.add(Double.parseDouble(data.substring(last+1, next)));
                        last=next;
-                       next=line.indexOf(",",last+1);
-                       posy.add(Double.parseDouble(line.substring(last+1, next)));
+                       next=data.indexOf(",",last+1);
+                       posy.add(Double.parseDouble(data.substring(last+1, next)));
                        last=next;
-                       next=line.indexOf(",",last+1);
-                       posz.add(Double.parseDouble(line.substring(last+1, next)));
-                       last=line.indexOf("id",next)+2;
-                       next=line.indexOf("}",last);
-                       keys.add(Integer.parseInt(line.substring(last+1,next)));
-                       last=line.indexOf("pos",next)+2;
-                       next=line.indexOf(",",last);
+                       next=data.indexOf(",",last+1);
+                       posz.add(Double.parseDouble(data.substring(last+1, next)));
+                       last=data.indexOf("id",next)+4;
+                       next=data.indexOf("}",last);
+                       keys.add(Integer.parseInt(data.substring(last+1,next)));
+                       last=data.indexOf("pos",next)+5;
+                       next=data.indexOf(",",last);
                    }
-                   last=line.indexOf("src")+2;
-                   next=line.indexOf(",",last);
+                for (int i = 0; i < keys.size(); i++)
+                {
+                    node_data newNode = new nodedata(keys.get(i));
+                    geolocation location = new geolocation(posx.get(i), posy.get(i), posz.get(i));
+                    newNode.setLocation(location);
+                    temp.addNode(newNode);
+                }
+                   last=data.indexOf("src")+5;
+                   next=data.indexOf(",",last);
                    int src;
                    int dest;
                    double w;
                    while(next!=-1&&last!=-1) {
-                   src=Integer.parseInt(line.substring(last+1,next));
-                   w=Double.parseDouble(line.substring(last+1, next));
-                    dest=Integer.parseInt(line.substring(last+1,next));
-                       temp.cocncet(
+                   src=Integer.parseInt(data.substring(last+1,next));
+                       last=data.indexOf("w")+2;
+                       next=data.indexOf(",",last);
+                   w=Double.parseDouble(data.substring(last+1, next));
+                       last=data.indexOf("w")+2;
+                       next=data.indexOf("}",last);
+                    dest=Integer.parseInt(data.substring(last+1,next));
+                      temp.connect(src,dest,w);
                    }
-
-                   */
-
-
+               }
+            gr = temp; //TODO will this work?
             return true;
         } catch (Exception e) {
             System.out.println(e);
@@ -298,8 +316,9 @@ public class DWGraph_Algo implements dw_graph_algorithms {
         DWGraph_Algo algo=new DWGraph_Algo();
         DWGraph_DS graph=new DWGraph_DS();
         algo.init(graph);
-        boolean successfulLoad=algo.load("C:\\A0");
+        boolean successfulLoad=algo.load("C:\\Users\\eliap\\IdeaProjects\\Ex2\\data\\A0");
         System.out.println(successfulLoad);
     }
+
 
 }
