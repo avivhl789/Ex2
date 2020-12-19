@@ -1,6 +1,7 @@
 package ex2;
 
 import api.*;
+import gameClient.CL_Agent;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -374,13 +375,65 @@ public class DWGraph_Algo implements dw_graph_algorithms {
     }
 
 
-    public static void main(String[]args)
-    {
-        DWGraph_Algo algo=new DWGraph_Algo();
-        DWGraph_DS graph=new DWGraph_DS();
-        algo.init(graph);
-        boolean successfulLoad=algo.load("C:\\Users\\eliap\\IdeaProjects\\Ex2\\data\\A0");
-        System.out.println(successfulLoad);
+    public CL_Agent.PathHelper clientShortestPath(int src, int dest) {
+        if (gr.nodeSize() < 2)
+            return null;
+        if (gr.getNode(src) == null || gr.getNode(dest) == null)
+            return null;
+        if (gr.nodeSize() == 2) {
+            if (gr.getEdge(src, dest) == null)
+                return null;
+            List<node_data> path = new ArrayList<>();
+            path.add(gr.getNode(src));
+            double weight =gr.getEdge(src, dest).getWeight();
+            CL_Agent.PathHelper name=new CL_Agent.PathHelper(weight,path);
+            return name;
+        }
+        HashMap<Integer, Double> costpath = new HashMap<Integer, Double>();
+        HashMap<Integer, Integer> mappath = new HashMap<Integer, Integer>();
+        double weight;
+        PriorityQueue<node_data> queue = new PriorityQueue<node_data>((Comparator<node_data>) new Comparator<node_data>() {
+            @Override
+            public int compare(node_data node1, node_data node2) {
+                if (costpath.get(node1.getKey()) < +costpath.get(node2.getKey()))
+                    return -1;
+                else if (costpath.get(node1.getKey()) > costpath.get(node2.getKey()))
+                    return 1;
+                return 0;
+            }
+        }
+        );
+        node_data N = this.gr.getNode(src);
+        node_data ni;
+        costpath.put(N.getKey(),0.0);
+        queue.add(N);
+        boolean flag = false;
+        while (!queue.isEmpty()) {
+            N = queue.remove();
+            HashMap<Integer, edge_data> temp = ((nodedata) gr.getNode(N.getKey())).getNi();
+            for (Integer keyofnei : temp.keySet()) {
+                ni = gr.getNode(keyofnei);
+                if (!costpath.containsKey(ni.getKey())) {
+                    costpath.put(ni.getKey(), costpath.get(N.getKey()) + temp.get(keyofnei).getWeight());
+                    ni.setTag(1);
+                    queue.add(ni);
+                    mappath.put(ni.getKey(), N.getKey());
+                } else if (costpath.get(ni.getKey()) > costpath.get(N.getKey()) + temp.get(keyofnei).getWeight()) {
+                    costpath.put(ni.getKey(), costpath.get(N.getKey()) + temp.get(keyofnei).getWeight());
+                    queue.add(ni);
+                    mappath.put(ni.getKey(), N.getKey());
+                }
+                if (ni.getKey() == dest)
+                    flag = true;
+            }
+        }
+        if (flag) {
+            List<node_data> path =shortestPath(src, gr.getNode(dest), mappath);
+            weight=costpath.get(dest);
+            CL_Agent.PathHelper name=new CL_Agent.PathHelper(weight,path);
+            return name;
+        }
+        return null;
     }
 
 
