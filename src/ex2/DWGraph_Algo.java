@@ -79,6 +79,8 @@ public class DWGraph_Algo implements dw_graph_algorithms {
             return -1;
         if(gr.getNode(src) == null || gr.getNode(dest) == null)
             return -1;
+        if (src==dest)
+            return 0;
         if (gr.nodeSize() == 2) {
             if (gr.getEdge(src, dest) != null)
                 return gr.getEdge(src, dest).getWeight();
@@ -356,14 +358,57 @@ public class DWGraph_Algo implements dw_graph_algorithms {
 //            return false;
 //        }
     }
+    public boolean loadfromstirng(String js) {
+        JSONTokener buffer; // config json tokenizer so i can convert file to json tokenizer
 
-    private void reset_tag() {
-        Iterator<node_data> ite = this.gr.getV().iterator();
-        node_data node;
-        while (ite.hasNext()) {
-            node = ite.next();
-            node.setTag(-1);
+        try
+        {
+            try
+            {
+
+                buffer = new JSONTokener(js); //converting file to json tokenizer
+                JSONObject json_object_temp = new JSONObject(); //config temp json object to manipulate the buffer readings
+
+                json_object_temp.put("graph", buffer.nextValue()); // add buffer tokenizer and graph string as a key
+                JSONObject json_object = new JSONObject(); // config an original json object
+                json_object=(JSONObject) json_object_temp.get("graph"); // extracting the value that appends graph key and insert into json object and casting
+
+                JSONArray edgesList =new  JSONArray(); // configuring edge list and node list json arrays
+                JSONArray nodesList =new  JSONArray();
+
+                edgesList=(JSONArray) json_object.get("Edges"); // inserting values into both arrays using the original jason object
+                nodesList=(JSONArray) json_object.get("Nodes");
+
+                directed_weighted_graph g_copy = new DWGraph_DS(); // constructing new graph DWGraph_DS
+
+                for(int i=0;i<nodesList.length();i++) // going over nodes list creating the nodes inserting positions and adding later to new graph
+                {
+                    node_data N=new nodedata(nodesList.getJSONObject(i).getInt("id"));
+                    geo_location p=new geolocation(nodesList.getJSONObject(i).getString("pos"));
+                    N.setLocation(p);
+                    g_copy.addNode(N);
+                }
+                for(int i=0;i<edgesList.length();i++) // going over edge list and connecting existing nodes to together
+                {
+                    g_copy.connect(edgesList.getJSONObject(i).getInt("src"), edgesList.getJSONObject(i).getInt("dest"), edgesList.getJSONObject(i).getDouble("w"));
+
+                }
+
+                init(g_copy); // init graph to be the new graph
+            }
+            catch (Exception  e2)
+            {
+                e2.printStackTrace();
+                return false;
+            }
         }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+
     }
 
 
@@ -380,6 +425,12 @@ public class DWGraph_Algo implements dw_graph_algorithms {
             return null;
         if (gr.getNode(src) == null || gr.getNode(dest) == null)
             return null;
+        if (src==dest) {
+            List<node_data> path = new ArrayList<>();
+            double weight=0.0;
+            CL_Agent.PathHelper name=new CL_Agent.PathHelper(weight,path);
+            return name;
+        }
         if (gr.nodeSize() == 2) {
             if (gr.getEdge(src, dest) == null)
                 return null;

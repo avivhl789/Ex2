@@ -19,7 +19,6 @@ public class EnterScreen extends JFrame implements ActionListener{
     private JTextField textforid;
     private JPanel loginpanel;
     private JSpinner spinner1;
-    private JSpinner spinner2;
     private JButton button1=new JButton("start game");
 
     public EnterScreen(){
@@ -28,12 +27,9 @@ public class EnterScreen extends JFrame implements ActionListener{
         ImageIcon img=new ImageIcon("images//backforenter.jpg");
         JLabel background=new JLabel("",img,JLabel.CENTER);
         background.setBounds(0,0,img.getIconWidth(),img.getIconHeight());
-        SpinnerNumberModel model1 = new SpinnerNumberModel(0, 0.0, 2, 1.0);
-        SpinnerNumberModel model2 = new SpinnerNumberModel(0, 0.0, 9, 1.0);
-        JSpinner spinner1=new JSpinner(model1);
+        SpinnerNumberModel model1 = new SpinnerNumberModel(0, 0, 23, 1);
+        spinner1=new JSpinner(model1);
         spinner1.setBounds(180,580,150,20);
-        JSpinner spinner2=new JSpinner(model2);
-        spinner2.setBounds(280,480,150,20);
         textforid = new JTextField(15);
         textforid.setBounds(200, 30, 150, 20);
         setSize(368, 368);
@@ -42,7 +38,6 @@ public class EnterScreen extends JFrame implements ActionListener{
         //add(background);
         loginpanel.add(textforid);
         loginpanel.add(spinner1);
-        loginpanel.add(spinner2);
         loginpanel.add(button1);
         loginpanel.setBackground(new Color(37,84,20));
         getContentPane().add(loginpanel);
@@ -59,15 +54,25 @@ public class EnterScreen extends JFrame implements ActionListener{
     {
         if(textforid.getText().isBlank())
             return 0;
-        return Integer.parseInt(textforid.getText());
+        try{
+            int id=Integer.parseInt(textforid.getText());
+            return  id;
+
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return 0;
+        }
 
     }
     public int getlevel()
     {
-        int teen=(Integer) spinner1.getValue()*10;
-        int ones=(Integer)spinner2.getValue();
-        int lv=teen+ones;
-        return Math.min(23,Math.max(0,lv)) ;
+        try {
+            int lv = (Integer) (spinner1.getValue());
+            return Math.min(23, Math.max(0, lv));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
 
     }
     public boolean getStartGame()

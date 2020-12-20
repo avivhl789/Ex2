@@ -4,7 +4,10 @@ import Server.Game_Server_Ex2;
 import api.directed_weighted_graph;
 import api.edge_data;
 import api.game_service;
+import api.node_data;
 import ex2.DWGraph_Algo;
+import ex2.DWGraph_DS;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -15,13 +18,15 @@ public class Ex2 implements Runnable {
     private static MyFrame _win;
     private static Arena _ar;
     private static DWGraph_Algo algo = new DWGraph_Algo();
+    private static HashMap<Integer, HashMap<Integer, CL_Agent.PathHelper>> fullgrmaping = new HashMap<>();
+    long dt = 100;
 
 
     public static void main(String[] a) {
         EnterScreen gui = new EnterScreen();
         test = gui;
         while (!gui.getStartGame()) {
-            System.out.println("");
+            System.out.print("");
         }
 
         Thread client = new Thread(new Ex2());
@@ -36,13 +41,22 @@ public class Ex2 implements Runnable {
         //	game.login(id);
         String g = game.getGraph();
         String pks = game.getPokemons();
-        directed_weighted_graph gg = game.getJava_Graph_Not_to_be_used();
-        algo.init(gg);
+        algo.loadfromstirng(g);
+        directed_weighted_graph gg = algo.getGraph();
+        HashMap<Integer, node_data> grmap = ((DWGraph_DS) gg).gethashmap();
+        for (Integer src : grmap.keySet()) {
+            fullgrmaping.put(src, new HashMap<Integer, CL_Agent.PathHelper>());
+            for (Integer dest : grmap.keySet()) {
+                fullgrmaping.get(src).put(dest, algo.clientShortestPath(src, dest));
+            }
+        }
+
+
         init(game);
         game.startGame();
+        System.out.println(game.timeToEnd()/1000);
         _win.setTitle("Ex2 - OOP: (NONE trivial Solution) " + game.toString());
         int ind = 0;
-        long dt = 100;
 
         while (game.isRunning()) {
             moveAgants(game, gg);
@@ -70,83 +84,90 @@ public class Ex2 implements Runnable {
      * @param gg
      * @param
      */
-    private static void moveAgants(game_service game, directed_weighted_graph gg) {
+    private static void moveAgants(@NotNull game_service game, directed_weighted_graph gg) {
         String lg = game.move();
+        //System.out.println(lg);
         List<CL_Agent> log = Arena.getAgents(lg, gg);
         _ar.setAgents(log);
         //ArrayList<OOP_Point3D> rs = new ArrayList<OOP_Point3D>();
         String fs = game.getPokemons();
         List<CL_Pokemon> ffs = Arena.json2Pokemons(fs);
         _ar.setPokemons(ffs);
+
         for (int i = 0; i < log.size(); i++) {
             for (int j = 0; j < ffs.size(); j++) {
-                log.get(i).path(algo, ffs.get(j));
-            }
-        }
-        HashMap<CL_Pokemon, CL_Agent> pair = new HashMap<>();
-        HashMap<CL_Pokemon, CL_Agent> bastpair = new HashMap<>();
-        double max = -1;
-        double minmax = Double.MAX_VALUE;
-        for (int i = 0; i < log.size(); i++) {
-            for (int j = 0; j < log.size(); j++) {
-                int overflow = (i + j) % log.size();
-                CL_Agent ag = log.get(overflow);
-                CL_Agent.PathHelper curr = ag.getPathCompare().poll();
-                while (pair.containsKey(curr.getPoke())) {
-                    curr = ag.getPathCompare().poll();
+                CL_Agent ag = log.get(i);
+                if (!ag.isMoving()) {
+                    CL_Pokemon pok = ffs.get(j);
+                    _ar.updateEdge(pok, _ar.getGraph());
+                    CL_Agent.PathHelper curr = fullgrmaping.get(ag.getSrcNode()).get(pok.get_edge().getSrc());
+                    curr.setTotalCost(curr.getTotalCost() / ag.getSpeed());
+                    curr.setpoke(pok);
+                    if (curr.getThePath().size() != 0){
+                        if (curr.getThePath().get(curr.getThePath().size() - 1) != gg.getNode(pok.get_edge().getDest()))
+                            curr.getThePath().add(gg.getNode(pok.get_edge().getDest()));}
+                        else
+                        curr.getThePath().add(gg.getNode(pok.get_edge().getDest()));
+                            ag.getPathCompare().add(curr);
                 }
-                ag.getPathCompare().add(curr);
-                pair.put(curr.poke, ag);
-                max = Math.max(max, curr.getTotalCost());
             }
-            if (max < minmax) {
-                minmax = max;
-                bastpair = (HashMap<CL_Pokemon, CL_Agent>) pair.clone();
-            }
-            max = -1;
-        }
-        for(CL_Pokemon p : bastpair.keySet())
-        {
-           bastpair.get(p).setNextNode(p.get_edge().getSrc());
+
         }
 
-        CL_Agent ag = log.get(i);
-        int id = ag.getID();
-        int dest = ag.getNextNode();
-        int src = ag.getSrcNode();
-        double v = ag.getValue();
-        if (dest == -1) {
-            dest = nextNode(gg, src);
-            game.chooseNextEdge(ag.getID(), dest);
-            System.out.println("Agent: " + id + ", val: " + v + "   turned to node: " + dest);
+//        HashMap<CL_Pokemon, CL_Agent> pair = new HashMap<>();
+//        HashMap<CL_Pokemon, CL_Agent> bastpair = new HashMap<>();
+//        double max = -1;
+//        double minmax = Double.MAX_VALUE;
+//        for (int i = 0; i < log.size(); i++) {
+//            for (int j = 0; j < log.size(); j++) {
+//                int overflow = (i + j) % log.size();
+//                CL_Agent ag = log.get(overflow);
+//                CL_Agent.PathHelper curr = ag.getPathCompare().poll();
+//                while (pair.containsKey(curr.getPoke()) && !ag.getPathCompare().isEmpty()) {
+//                    curr = ag.getPathCompare().poll();
+//                }
+//                ag.getPathCompare().add(curr);
+//                pair.put(curr.poke, ag);
+//                max = Math.max(max, curr.getTotalCost());
+//            }
+//            if (max < minmax) {
+//                minmax = max;
+//                bastpair = (HashMap<CL_Pokemon, CL_Agent>) pair.clone();
+//            }
+//            max = -1;
+//        }
+
+        for (int i = 0; log.size() > i; i++) {
+            CL_Agent ag = log.get(i);
+            int id = ag.getID();
+            int dest = ag.getNextNode();
+            int src = ag.getSrcNode();
+            double v = ag.getValue();
+            if (dest == -1 && !ag.isMoving()) {
+                dest = nextNode(ag);
+                game.chooseNextEdge(id, dest);
+                //  System.out.println("Agent: " + id + ", val: " + v + "   turned to node: "
+                //        + dest +"time left for game: " + game.timeToEnd()/1000);
+            }
 
         }
     }
 
 
-    /**
-     * a very simple random walk implementation!
-     *
-     * @param g
-     * @param src
-     * @return
-     */
-    private static int nextNode(directed_weighted_graph g, int src) {
-        int ans = -1;
-        Collection<edge_data> ee = g.getE(src);
-        Iterator<edge_data> itr = ee.iterator();
-        int s = ee.size();
-        int r = (int) (Math.random() * s);
-        int i = 0;
-        while (i < r) {
-            itr.next();
-            i++;
+    private static int nextNode(@NotNull CL_Agent ag) {
+        if (ag.getPathCompare().peek().getThePath().size() >= 1) {
+            if(ag.getSrcNode()==ag.getPathCompare().peek().getThePath().get(0).getKey())
+            ag.getPathCompare().peek().getThePath().remove(0);
+            node_data n = ag.getPathCompare().peek().getThePath().get(0);
+            if (ag.getPathCompare().peek().getThePath().size() == 1) {
+                ag.getPathCompare().remove(0);
+            }
+            return n.getKey();
         }
-        ans = itr.next().getDest();
-        return ans;
+        return -1;
     }
 
-    private void init(game_service game) {
+    private void init(@NotNull game_service game) {
         String g = game.getGraph();
         String fs = game.getPokemons();
         directed_weighted_graph gg = game.getJava_Graph_Not_to_be_used();
