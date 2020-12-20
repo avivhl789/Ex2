@@ -20,17 +20,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b9550c52-358a-44fa-badf-49b73e41abdd" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/gameClient/EnterScreen.form" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/gameClient/EnterScreen.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ex2/DWGraph_Algo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ex2/DWGraph_Algo.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gameClient/CL_Agent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gameClient/CL_Agent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gameClient/Ex2_Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gameClient/Ex2.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gameClient/MyFrame.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gameClient/MyFrame.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gameClient/Ex2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gameClient/Ex2.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -152,10 +144,10 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="574" y="119" key="#com.intellij.ide.util.MemberChooser" timestamp="1608416975161">
+    <state x="574" y="119" key="#com.intellij.ide.util.MemberChooser" timestamp="1608461797681">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="574" y="119" key="#com.intellij.ide.util.MemberChooser/0.0.1536.824@0.0.1536.824" timestamp="1608416975161" />
+    <state x="574" y="119" key="#com.intellij.ide.util.MemberChooser/0.0.1536.824@0.0.1536.824" timestamp="1608461797681" />
     <state width="1493" height="210" key="GridCell.Tab.0.bottom" timestamp="1608418786550">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
@@ -180,10 +172,10 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="611" y="170" key="refactoring.ChangeSignatureDialog/0.0.1536.824@0.0.1536.824" timestamp="1608411744595" />
-    <state x="425" y="187" key="run.anything.popup" timestamp="1608242234882">
+    <state x="425" y="187" key="run.anything.popup" timestamp="1608462021759">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="425" y="187" key="run.anything.popup/0.0.1536.824@0.0.1536.824" timestamp="1608242234882" />
+    <state x="425" y="187" key="run.anything.popup/0.0.1536.824@0.0.1536.824" timestamp="1608462021759" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

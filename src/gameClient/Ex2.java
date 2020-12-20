@@ -83,21 +83,45 @@ public class Ex2 implements Runnable {
                 log.get(i).path(algo, ffs.get(j));
             }
         }
+        HashMap<CL_Pokemon, CL_Agent> pair = new HashMap<>();
+        HashMap<CL_Pokemon, CL_Agent> bastpair = new HashMap<>();
+        double max = -1;
+        double minmax = Double.MAX_VALUE;
         for (int i = 0; i < log.size(); i++) {
-            CL_Agent ag = log.get(i);
-        }
-            CL_Agent ag = log.get(i);
-            int id = ag.getID();
-            int dest = ag.getNextNode();
-            int src = ag.getSrcNode();
-            double v = ag.getValue();
-            if (dest == -1) {
-                dest = nextNode(gg, src);
-                game.chooseNextEdge(ag.getID(), dest);
-                System.out.println("Agent: " + id + ", val: " + v + "   turned to node: " + dest);
-
+            for (int j = 0; j < log.size(); j++) {
+                int overflow = (i + j) % log.size();
+                CL_Agent ag = log.get(overflow);
+                CL_Agent.PathHelper curr = ag.getPathCompare().poll();
+                while (pair.containsKey(curr.getPoke())) {
+                    curr = ag.getPathCompare().poll();
+                }
+                ag.getPathCompare().add(curr);
+                pair.put(curr.poke, ag);
+                max = Math.max(max, curr.getTotalCost());
             }
+            if (max < minmax) {
+                minmax = max;
+                bastpair = (HashMap<CL_Pokemon, CL_Agent>) pair.clone();
+            }
+            max = -1;
         }
+        for(CL_Pokemon p : bastpair.keySet())
+        {
+           bastpair.get(p).setNextNode(p.get_edge().getSrc());
+        }
+
+        CL_Agent ag = log.get(i);
+        int id = ag.getID();
+        int dest = ag.getNextNode();
+        int src = ag.getSrcNode();
+        double v = ag.getValue();
+        if (dest == -1) {
+            dest = nextNode(gg, src);
+            game.chooseNextEdge(ag.getID(), dest);
+            System.out.println("Agent: " + id + ", val: " + v + "   turned to node: " + dest);
+
+        }
+    }
 
 
     /**

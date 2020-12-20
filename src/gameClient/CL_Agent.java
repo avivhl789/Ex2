@@ -29,6 +29,7 @@ public class CL_Agent {
     private PathHelper help;
     private PriorityQueue<PathHelper> pathCompare;
 
+
     {
         new PriorityQueue<>((Comparator<PathHelper>) new Comparator<PathHelper>() {
             @Override
@@ -218,6 +219,15 @@ public class CL_Agent {
     public void set_sg_dt(long _sg_dt) {
         this._sg_dt = _sg_dt;
     }
+
+    public PathHelper getHelp() {
+        return help;
+    }
+
+    public PriorityQueue<PathHelper> getPathCompare() {
+        return pathCompare;
+    }
+
 
     public static class PathHelper {
         private double totalCost;
