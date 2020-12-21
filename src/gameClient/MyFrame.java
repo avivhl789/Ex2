@@ -10,6 +10,7 @@ import gameClient.util.Range2D;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.Iterator;
 import java.util.List;
 
@@ -44,13 +45,26 @@ public class MyFrame extends JFrame{
 	public void paint(Graphics g) {
 		int w = this.getWidth();
 		int h = this.getHeight();
-		g.clearRect(0, 0, w, h);
-	//	updateFrame();
-		drawPokemons(g);
+		Image img = createImage(w, h);
+		Graphics bg= img.getGraphics();
+		paintComponents(bg);
+		g.drawImage(img, 0, 0, this);
+	}
+	@Override
+	public void paintComponents(Graphics g)
+	{
+		int Width = this.getWidth();
+		int Height = this.getHeight();
+		g.clearRect(0, 0, Width, Height);
+		ImageIcon background =new ImageIcon("images//backforgame.jpg");
+		BufferedImage resizedImg = new BufferedImage(Width, Height, BufferedImage.TYPE_3BYTE_BGR);
+		Graphics2D G2D = resizedImg.createGraphics();
+		G2D.drawImage(background.getImage(), 0, 0, Width, Height, null);
+		g.drawImage(resizedImg,0,0,background.getImageObserver());
+		updateFrame();
 		drawGraph(g);
 		drawAgants(g);
-		drawInfo(g);
-		
+		drawPokemons(g);
 	}
 	private void drawInfo(Graphics g) {
 		List<String> str = _ar.get_info();
@@ -81,16 +95,14 @@ public class MyFrame extends JFrame{
 		Iterator<CL_Pokemon> itr = fs.iterator();
 		
 		while(itr.hasNext()) {
-			
 			CL_Pokemon f = itr.next();
 			Point3D c = f.getLocation();
-			int r=10;
 			g.setColor(Color.green);
 			if(f.getType()<0) {g.setColor(Color.orange);}
 			if(c!=null) {
 
 				geo_location fp = this._w2f.world2frame(c);
-				g.fillOval((int)fp.x()-r, (int)fp.y()-r, 2*r, 2*r);
+				g.drawImage(f.getpokeimg().getImage(),(int)fp.x()-35, (int)fp.y()-35,f.getpokeimg().getImageObserver());
 			//	g.drawString(""+n.getKey(), fp.ix(), fp.iy()-4*r);
 				
 			}
@@ -105,12 +117,12 @@ public class MyFrame extends JFrame{
 		while(rs!=null && i<rs.size()) {
 			geo_location c = rs.get(i).getLocation();
 			int r=8;
-			i++;
 			if(c!=null) {
-
 				geo_location fp = this._w2f.world2frame(c);
-				g.fillOval((int)fp.x()-r, (int)fp.y()-r, 2*r, 2*r);
+				g.drawImage(rs.get(i).getScaledagimg().getImage(), (int) fp.x() - 35, (int) fp.y() - 35, rs.get(i).getScaledagimg().getImageObserver());
+				//g.drawString(""+rs.get(i).getID(), (int) fp.x() - 35, (int) fp.y() - 35);
 			}
+			i++;
 		}
 	}
 	private void drawNode(node_data n, int r, Graphics g) {

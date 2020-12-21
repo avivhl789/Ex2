@@ -45,7 +45,7 @@ public class DWGraph_Algo_Tests
     @Test
     public void successfulFileSave()
     {
-        String fileName = "C:\\Users\\eliap\\IdeaProjects\\Ariel_OOP_2020\\Assignments\\Ex2\\src\\data\\test";
+        String fileName = "data\\test";
         boolean didItWork = tester.save(fileName);
         assert didItWork;
     }
@@ -53,7 +53,7 @@ public class DWGraph_Algo_Tests
     @Test
     public void successfulFileLoad()
     {
-        String fileName = "C:\\Users\\eliap\\IdeaProjects\\Ariel_OOP_2020\\Assignments\\Ex2\\src\\data\\test";
+        String fileName = "data\\test";
         DWGraph_DS oldGraph = (DWGraph_DS) tester.copy();
         boolean didItWork = tester.load(fileName);
         if (oldGraph.equals(tester.getGraph()))
@@ -65,7 +65,7 @@ public class DWGraph_Algo_Tests
     @Test
     public void is_Saved_Graph_Identical_To_Loaded_Graph()
     {
-        String fileName = "C:\\Users\\eliap\\IdeaProjects\\Ariel_OOP_2020\\Assignments\\Ex2\\src\\data\\test";
+        String fileName = "data\\test";
         tester.load(fileName);
         DWGraph_DS loadedGraph = (DWGraph_DS) tester.getGraph();
         assert loadedGraph.equals(graph) : "loaded graph is " + loadedGraph.toString() +

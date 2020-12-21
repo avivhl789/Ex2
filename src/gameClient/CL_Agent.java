@@ -7,8 +7,11 @@ import api.node_data;
 import ex2.DWGraph_Algo;
 import ex2.nodedata;
 import gameClient.util.Point3D;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
+import javax.swing.*;
+import java.awt.*;
 import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -28,6 +31,11 @@ public class CL_Agent {
     private long _sg_dt;
     private PathHelper help;
     private PriorityQueue<PathHelper> pathCompare;
+    private ImageIcon agimg = new ImageIcon("images\\imgforag.jpg");
+    Image scaledImg= agimg.getImage().getScaledInstance(70, 70, Image.SCALE_DEFAULT);
+    private ImageIcon scaledagimg=new ImageIcon(scaledImg);
+    private List<node_data>  bastpath;
+
 
     {
         new PriorityQueue<>((Comparator<PathHelper>) new Comparator<PathHelper>() {
@@ -47,6 +55,10 @@ public class CL_Agent {
     private double _value;
 
 
+    public CL_Agent() {
+        _curr_edge=null;
+    }
+
     public CL_Agent(directed_weighted_graph g, int start_node) {
         _gg = g;
         setMoney(0);
@@ -56,6 +68,7 @@ public class CL_Agent {
         setSpeed(0);
         help = new PathHelper(Double.POSITIVE_INFINITY, null);
         pathCompare = new PriorityQueue<>();
+        _curr_edge=null;
     }
 
     public void update(String json) {
@@ -107,14 +120,6 @@ public class CL_Agent {
 
     private void setMoney(double v) {
         _value = v;
-    }
-
-    public void path(DWGraph_Algo algo, CL_Pokemon somting) {
-            PathHelper res = algo.clientShortestPath(this._curr_node.getKey() ,somting.get_edge().getSrc());
-            res.thePath.add(algo.getGraph().getNode(somting.get_edge().getDest()));
-            res.setTotalCost(res.totalCost/_speed);
-            res.setpoke(somting);
-            pathCompare.add(res);
     }
 
     public boolean setNextNode(int dest) {
@@ -172,7 +177,13 @@ public class CL_Agent {
         }
         return ans;
     }
+    public void setBastpath(List<node_data> bastpath) {
+        this.bastpath = bastpath;
+    }
 
+    public List<node_data> getBastpath() {
+        return bastpath;
+    }
     public double getSpeed() {
         return this._speed;
     }
@@ -219,10 +230,23 @@ public class CL_Agent {
         this._sg_dt = _sg_dt;
     }
 
-    public static class PathHelper {
+    public PathHelper getHelp() {
+        return help;
+    }
+
+    public PriorityQueue<PathHelper> getPathCompare() {
+        return pathCompare;
+    }
+    public ImageIcon getScaledagimg() {
+        return scaledagimg;
+    }
+
+
+    public static class PathHelper implements Comparable<PathHelper>{
         private double totalCost;
         private List<node_data> thePath;
         CL_Pokemon poke;
+        int pokeDest;
 
         public PathHelper(double totalCost, List<node_data> thePath) {
             this.totalCost = totalCost;
@@ -253,6 +277,15 @@ public class CL_Agent {
         public CL_Pokemon getPoke() {
             return poke;
         }
-    }
 
+        @Override
+        public int compareTo(@NotNull PathHelper o) {
+            if (this.getTotalCost() < o.getTotalCost())
+                return -1;
+            else if (this.getTotalCost() > o.getTotalCost())
+                return 1;
+            return 0;
+        }
+    }
 }
+

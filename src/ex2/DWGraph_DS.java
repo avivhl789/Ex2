@@ -140,4 +140,7 @@ public class DWGraph_DS implements directed_weighted_graph
         }
         return true;
     }
+    public HashMap<Integer,node_data> gethashmap(){
+        return  graph;
+    }
 }
