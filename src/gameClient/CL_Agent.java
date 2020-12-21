@@ -34,7 +34,7 @@ public class CL_Agent {
     private ImageIcon agimg = new ImageIcon("images\\imgforag.jpg");
     Image scaledImg= agimg.getImage().getScaledInstance(70, 70, Image.SCALE_DEFAULT);
     private ImageIcon scaledagimg=new ImageIcon(scaledImg);
-
+    private List<node_data>  bastpath;
 
 
     {
@@ -177,7 +177,13 @@ public class CL_Agent {
         }
         return ans;
     }
+    public void setBastpath(List<node_data> bastpath) {
+        this.bastpath = bastpath;
+    }
 
+    public List<node_data> getBastpath() {
+        return bastpath;
+    }
     public double getSpeed() {
         return this._speed;
     }
