@@ -39,7 +39,8 @@ public class EnterScreen extends JFrame implements ActionListener{
         loginpanel.add(textforid);
         loginpanel.add(spinner1);
         loginpanel.add(button1);
-        loginpanel.setBackground(new Color(37,84,20));
+        loginpanel.add(background);
+        loginpanel.setBackground(new Color(50, 122, 191));
         getContentPane().add(loginpanel);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);

@@ -32,7 +32,7 @@ public class DWGraph_Algo implements dw_graph_algorithms {
     public directed_weighted_graph copy() {
         directed_weighted_graph temp = new DWGraph_DS();
         for (node_data node : this.gr.getV()) {
-            nodedata tempnode = new nodedata(node.getKey(),node.getInfo(),node.getTag(),node.getWeight(),node.getLocation());
+            nodedata tempnode = new nodedata(node.getKey(), node.getInfo(), node.getTag(), node.getWeight(), node.getLocation());
             temp.addNode(tempnode);
         }
         for (node_data node : this.gr.getV()) {
@@ -40,7 +40,7 @@ public class DWGraph_Algo implements dw_graph_algorithms {
             edge_data edge;
             while (ite.hasNext()) {
                 edge = ite.next();
-                temp.connect(node.getKey(),edge.getDest(),edge.getWeight());
+                temp.connect(node.getKey(), edge.getDest(), edge.getWeight());
             }
         }
         return temp;
@@ -55,7 +55,7 @@ public class DWGraph_Algo implements dw_graph_algorithms {
         node_data N = this.gr.getV().iterator().next(), ni;
         int count = 1;
         queue.add(N);
-        cheack.put(N.getKey(),0);
+        cheack.put(N.getKey(), 0);
         while (!queue.isEmpty()) {
             N = queue.remove();
             HashMap<Integer, edge_data> temp = ((nodedata) gr.getNode(N.getKey())).getNi();
@@ -63,7 +63,7 @@ public class DWGraph_Algo implements dw_graph_algorithms {
                 ni = gr.getNode(keyofnei);
                 if (!cheack.containsKey(keyofnei)) {
                     queue.add(ni);
-                    cheack.put(keyofnei,0);
+                    cheack.put(keyofnei, 0);
                     count++;
                 }
             }
@@ -77,9 +77,9 @@ public class DWGraph_Algo implements dw_graph_algorithms {
     public double shortestPathDist(int src, int dest) {
         if (gr.nodeSize() < 2)
             return -1;
-        if(gr.getNode(src) == null || gr.getNode(dest) == null)
+        if (gr.getNode(src) == null || gr.getNode(dest) == null)
             return -1;
-        if (src==dest)
+        if (src == dest)
             return 0;
         if (gr.nodeSize() == 2) {
             if (gr.getEdge(src, dest) != null)
@@ -114,7 +114,7 @@ public class DWGraph_Algo implements dw_graph_algorithms {
                     queue.add(ni);
                 }
                 if (keyofnei == dest)
-                    cost = Math.min(cost,costpath.get(keyofnei));
+                    cost = Math.min(cost, costpath.get(keyofnei));
             }
         }
         if (cost != Double.MAX_VALUE)
@@ -151,7 +151,7 @@ public class DWGraph_Algo implements dw_graph_algorithms {
         );
         node_data N = this.gr.getNode(src);
         node_data ni;
-        costpath.put(N.getKey(),0.0);
+        costpath.put(N.getKey(), 0.0);
         queue.add(N);
         boolean flag = false;
         while (!queue.isEmpty()) {
@@ -204,13 +204,13 @@ public class DWGraph_Algo implements dw_graph_algorithms {
             node_data correctnode = temp.next();
             JSONObject obj = new JSONObject();
             try {
-                StringBuilder pos= new StringBuilder();
+                StringBuilder pos = new StringBuilder();
                 pos.append(correctnode.getLocation().x());
                 pos.append(",");
                 pos.append(correctnode.getLocation().y());
                 pos.append(",");
                 pos.append(correctnode.getLocation().z());
-                obj.put("pos",pos.toString());
+                obj.put("pos", pos.toString());
                 obj.put("id", correctnode.getKey());
                 nodesdata.put(obj);
                 obj = new JSONObject();
@@ -251,172 +251,88 @@ public class DWGraph_Algo implements dw_graph_algorithms {
 
     @Override
     public boolean load(String file) {
-        JSONTokener buffer; // config json tokenizer so i can convert file to json tokenizer
+        try {
+            try {
+                FileReader readenfile;
+                readenfile = new FileReader(file);
+                JSONTokener buff = new JSONTokener(readenfile);
+                JSONObject holder = new JSONObject();
 
-        try
-        {
-            FileReader file_;
-            try
-            {
-                file_ = new FileReader(file);
-                buffer = new JSONTokener(file_); //converting file to json tokenizer
-                JSONObject json_object_temp = new JSONObject(); //config temp json object to manipulate the buffer readings
+                holder.put("Graph", buff.nextValue());
+                JSONObject json_object = (JSONObject) holder.get("Graph");
 
-                json_object_temp.put("graph", buffer.nextValue()); // add buffer tokenizer and graph string as a key
-                JSONObject json_object = new JSONObject(); // config an original json object
-                json_object=(JSONObject) json_object_temp.get("graph"); // extracting the value that appends graph key and insert into json object and casting
+                JSONArray EdgesList = (JSONArray) json_object.get("Edges");
+                JSONArray NodesList = (JSONArray) json_object.get("Nodes");
 
-                JSONArray edgesList =new  JSONArray(); // configuring edge list and node list json arrays
-                JSONArray nodesList =new  JSONArray();
+                DWGraph_DS temp = new DWGraph_DS();
 
-                edgesList=(JSONArray) json_object.get("Edges"); // inserting values into both arrays using the original jason object
-                nodesList=(JSONArray) json_object.get("Nodes");
-
-                directed_weighted_graph g_copy = new DWGraph_DS(); // constructing new graph DWGraph_DS
-
-                for(int i=0;i<nodesList.length();i++) // going over nodes list creating the nodes inserting positions and adding later to new graph
-                {
-                    node_data N=new nodedata(nodesList.getJSONObject(i).getInt("id"));
-                    geo_location p=new geolocation(nodesList.getJSONObject(i).getString("pos"));
+                for (int i = 0; i < NodesList.length(); i++) {
+                    int key = NodesList.getJSONObject(i).getInt("id");
+                    node_data N = new nodedata(key);
+                    geo_location p = new geolocation(NodesList.getJSONObject(i).getString("pos"));
                     N.setLocation(p);
-                    g_copy.addNode(N);
+                    temp.addNode(N);
                 }
-                for(int i=0;i<edgesList.length();i++) // going over edge list and connecting existing nodes to together
-                {
-                    g_copy.connect(edgesList.getJSONObject(i).getInt("src"), edgesList.getJSONObject(i).getInt("dest"), edgesList.getJSONObject(i).getDouble("w"));
-
+                for (int i = 0; i < EdgesList.length(); i++) {
+                    int src = EdgesList.getJSONObject(i).getInt("src");
+                    int dest = EdgesList.getJSONObject(i).getInt("dest");
+                    double w = EdgesList.getJSONObject(i).getDouble("w");
+                    temp.connect(src, dest, w);
                 }
-
-                init(g_copy); // init graph to be the new graph
-                file_.close(); //closing file
-            }
-            catch (FileNotFoundException e2)
-            {
-                e2.printStackTrace();
+                readenfile.close();
+                init(temp);
+                return true;
+            } catch (FileNotFoundException eoffile) {
+                eoffile.printStackTrace();
                 return false;
             }
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
-        return true;
-//        try (FileReader reader = new FileReader(file)) {
-//            String data = Files.readString(Path.of(file));
-//            System.out.println(data);
-//            ArrayList<Double> posx = new ArrayList<Double>();
-//            ArrayList<Double> posy = new ArrayList<Double>();
-//            ArrayList<Double> posz = new ArrayList<Double>();
-//            ArrayList<Integer> keys = new ArrayList<Integer>();
-//            DWGraph_DS temp = new DWGraph_DS();
-//            if (data != null)
-//            {
-//               int last=data.indexOf("pos")+5;
-//               int next=data.indexOf(",",last);
-//                   while(next!=-1&&last!=-1) {
-//                       posx.add(Double.parseDouble(data.substring(last+1, next)));
-//                       last=next;
-//                       next=data.indexOf(",",last+1);
-//                       posy.add(Double.parseDouble(data.substring(last+1, next)));
-//                       last=next;
-//                       next=data.indexOf(",",last+1);
-//                       posz.add(Double.parseDouble(data.substring(last+1, next)));
-//                       last=data.indexOf("id",next)+4;
-//                       next=data.indexOf("}",last);
-//                       keys.add(Integer.parseInt(data.substring(last+1,next)));
-//                       last=data.indexOf("pos",next)+5;
-//                       next=data.indexOf(",",last);
-//                   }
-//                for (int i = 0; i < keys.size(); i++)
-//                {
-//                    node_data newNode = new nodedata(keys.get(i));
-//                    geolocation location = new geolocation(posx.get(i), posy.get(i), posz.get(i));
-//                    newNode.setLocation(location);
-//                    temp.addNode(newNode);
-//                }
-//                   last=data.indexOf("src")+5;
-//                   next=data.indexOf(",",last);
-//                   int src;
-//                   int dest;
-//                   double w;
-//                   while(next!=-1&&last!=-1) {
-//                   src=Integer.parseInt(data.substring(last+1,next));
-//                       last=data.indexOf("w")+2;
-//                       next=data.indexOf(",",last);
-//                   w=Double.parseDouble(data.substring(last+1, next));
-//                       last=data.indexOf("w")+2;
-//                       next=data.indexOf("}",last);
-//                    dest=Integer.parseInt(data.substring(last+1,next));
-//                      temp.connect(src,dest,w);
-//                   }
-//               }
-//            gr = temp; //TODO will this work?
-//            return true;
-//        } catch (Exception e) {
-//            System.out.println(e);
-//            return false;
-//        }
+
     }
+
     public boolean loadfromstirng(String js) {
-        JSONTokener buffer; // config json tokenizer so i can convert file to json tokenizer
+        try {
+            JSONObject holder = new JSONObject();
+            JSONTokener buff = new JSONTokener(js);
+            holder.put("Graph", buff.nextValue());
+            JSONObject json_object = (JSONObject) holder.get("Graph");
 
-        try
-        {
-            try
-            {
+            JSONArray EdgesList = (JSONArray) json_object.get("Edges");
+            JSONArray NodesList = (JSONArray) json_object.get("Nodes");
 
-                buffer = new JSONTokener(js); //converting file to json tokenizer
-                JSONObject json_object_temp = new JSONObject(); //config temp json object to manipulate the buffer readings
+            DWGraph_DS temp = new DWGraph_DS();
 
-                json_object_temp.put("graph", buffer.nextValue()); // add buffer tokenizer and graph string as a key
-                JSONObject json_object = new JSONObject(); // config an original json object
-                json_object=(JSONObject) json_object_temp.get("graph"); // extracting the value that appends graph key and insert into json object and casting
-
-                JSONArray edgesList =new  JSONArray(); // configuring edge list and node list json arrays
-                JSONArray nodesList =new  JSONArray();
-
-                edgesList=(JSONArray) json_object.get("Edges"); // inserting values into both arrays using the original jason object
-                nodesList=(JSONArray) json_object.get("Nodes");
-
-                directed_weighted_graph g_copy = new DWGraph_DS(); // constructing new graph DWGraph_DS
-
-                for(int i=0;i<nodesList.length();i++) // going over nodes list creating the nodes inserting positions and adding later to new graph
-                {
-                    node_data N=new nodedata(nodesList.getJSONObject(i).getInt("id"));
-                    geo_location p=new geolocation(nodesList.getJSONObject(i).getString("pos"));
-                    N.setLocation(p);
-                    g_copy.addNode(N);
-                }
-                for(int i=0;i<edgesList.length();i++) // going over edge list and connecting existing nodes to together
-                {
-                    g_copy.connect(edgesList.getJSONObject(i).getInt("src"), edgesList.getJSONObject(i).getInt("dest"), edgesList.getJSONObject(i).getDouble("w"));
-
-                }
-
-                init(g_copy); // init graph to be the new graph
+            for (int i = 0; i < NodesList.length(); i++) {
+                int key = NodesList.getJSONObject(i).getInt("id");
+                node_data N = new nodedata(key);
+                geo_location p = new geolocation(NodesList.getJSONObject(i).getString("pos"));
+                N.setLocation(p);
+                temp.addNode(N);
             }
-            catch (Exception  e2)
-            {
-                e2.printStackTrace();
-                return false;
+            for (int i = 0; i < EdgesList.length(); i++) {
+                int src = EdgesList.getJSONObject(i).getInt("src");
+                int dest = EdgesList.getJSONObject(i).getInt("dest");
+                double w = EdgesList.getJSONObject(i).getDouble("w");
+                temp.connect(src, dest, w);
             }
-        }
-        catch(Exception e)
-        {
+            init(temp);
+            return true;
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
-        return true;
 
     }
 
 
     @Override
     public boolean equals(Object o) {
-        if ( o.getClass() != this.getClass())
+        if (o.getClass() != this.getClass())
             return false;
-        return ((DWGraph_DS)gr).equals(o);
+        return ((DWGraph_DS) gr).equals(o);
     }
 
 
@@ -425,10 +341,10 @@ public class DWGraph_Algo implements dw_graph_algorithms {
             return null;
         if (gr.getNode(src) == null || gr.getNode(dest) == null)
             return null;
-        if (src==dest) {
+        if (src == dest) {
             List<node_data> path = new ArrayList<>();
-            double weight=0.0;
-            CL_Agent.PathHelper name=new CL_Agent.PathHelper(weight,path);
+            double weight = 0.0;
+            CL_Agent.PathHelper name = new CL_Agent.PathHelper(weight, path);
             return name;
         }
         if (gr.nodeSize() == 2) {
@@ -436,8 +352,8 @@ public class DWGraph_Algo implements dw_graph_algorithms {
                 return null;
             List<node_data> path = new ArrayList<>();
             path.add(gr.getNode(src));
-            double weight =gr.getEdge(src, dest).getWeight();
-            CL_Agent.PathHelper name=new CL_Agent.PathHelper(weight,path);
+            double weight = gr.getEdge(src, dest).getWeight();
+            CL_Agent.PathHelper name = new CL_Agent.PathHelper(weight, path);
             return name;
         }
         HashMap<Integer, Double> costpath = new HashMap<Integer, Double>();
@@ -456,7 +372,7 @@ public class DWGraph_Algo implements dw_graph_algorithms {
         );
         node_data N = this.gr.getNode(src);
         node_data ni;
-        costpath.put(N.getKey(),0.0);
+        costpath.put(N.getKey(), 0.0);
         queue.add(N);
         boolean flag = false;
         while (!queue.isEmpty()) {
@@ -479,9 +395,9 @@ public class DWGraph_Algo implements dw_graph_algorithms {
             }
         }
         if (flag) {
-            List<node_data> path =shortestPath(src, gr.getNode(dest), mappath);
-            weight=costpath.get(dest);
-            CL_Agent.PathHelper name=new CL_Agent.PathHelper(weight,path);
+            List<node_data> path = shortestPath(src, gr.getNode(dest), mappath);
+            weight = costpath.get(dest);
+            CL_Agent.PathHelper name = new CL_Agent.PathHelper(weight, path);
             return name;
         }
         return null;

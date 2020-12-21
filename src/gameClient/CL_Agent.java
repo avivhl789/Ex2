@@ -10,6 +10,8 @@ import gameClient.util.Point3D;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
+import javax.swing.*;
+import java.awt.*;
 import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -29,6 +31,10 @@ public class CL_Agent {
     private long _sg_dt;
     private PathHelper help;
     private PriorityQueue<PathHelper> pathCompare;
+    private ImageIcon agimg = new ImageIcon("images\\imgforag.jpg");
+    Image scaledImg= agimg.getImage().getScaledInstance(70, 70, Image.SCALE_DEFAULT);
+    private ImageIcon scaledagimg=new ImageIcon(scaledImg);
+
 
 
     {
@@ -49,6 +55,10 @@ public class CL_Agent {
     private double _value;
 
 
+    public CL_Agent() {
+        _curr_edge=null;
+    }
+
     public CL_Agent(directed_weighted_graph g, int start_node) {
         _gg = g;
         setMoney(0);
@@ -58,6 +68,7 @@ public class CL_Agent {
         setSpeed(0);
         help = new PathHelper(Double.POSITIVE_INFINITY, null);
         pathCompare = new PriorityQueue<>();
+        _curr_edge=null;
     }
 
     public void update(String json) {
@@ -220,9 +231,12 @@ public class CL_Agent {
     public PriorityQueue<PathHelper> getPathCompare() {
         return pathCompare;
     }
+    public ImageIcon getScaledagimg() {
+        return scaledagimg;
+    }
 
 
-    public static class PathHelper implements Comparable<PathHelper> {
+    public static class PathHelper implements Comparable<PathHelper>{
         private double totalCost;
         private List<node_data> thePath;
         CL_Pokemon poke;

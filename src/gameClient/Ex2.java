@@ -19,7 +19,8 @@ public class Ex2 implements Runnable {
     private static Arena _ar;
     private static DWGraph_Algo algo = new DWGraph_Algo();
     private static HashMap<Integer, HashMap<Integer, CL_Agent.PathHelper>> fullgrmaping = new HashMap<>();
-    long dt = 100;
+    private static long dt = 100;
+    private static CL_Agent slowest=new CL_Agent();
 
 
     public static void main(String[] a) {
@@ -59,6 +60,7 @@ public class Ex2 implements Runnable {
         int ind = 0;
 
         while (game.isRunning()) {
+            if (!slowest.isMoving())
             moveAgants(game, gg);
             try {
                 if (ind % 1 == 0) {
@@ -111,7 +113,6 @@ public class Ex2 implements Runnable {
                             ag.getPathCompare().add(curr);
                 }
             }
-
         }
 
 //        HashMap<CL_Pokemon, CL_Agent> pair = new HashMap<>();
@@ -122,18 +123,25 @@ public class Ex2 implements Runnable {
 //            for (int j = 0; j < log.size(); j++) {
 //                int overflow = (i + j) % log.size();
 //                CL_Agent ag = log.get(overflow);
+//                PriorityQueue<CL_Agent.PathHelper> clone = new PriorityQueue<>();
 //                CL_Agent.PathHelper curr = ag.getPathCompare().poll();
+//                clone.add(curr);
 //                while (pair.containsKey(curr.getPoke()) && !ag.getPathCompare().isEmpty()) {
 //                    curr = ag.getPathCompare().poll();
+//                    clone.add(curr);
 //                }
 //                ag.getPathCompare().add(curr);
 //                pair.put(curr.poke, ag);
 //                max = Math.max(max, curr.getTotalCost());
+//                while (!clone.isEmpty()) {
+//                    ag.getPathCompare().add (clone.poll());
+//                }
 //            }
 //            if (max < minmax) {
 //                minmax = max;
 //                bastpair = (HashMap<CL_Pokemon, CL_Agent>) pair.clone();
 //            }
+//        pair.clear();
 //            max = -1;
 //        }
 
@@ -143,12 +151,19 @@ public class Ex2 implements Runnable {
             int dest = ag.getNextNode();
             int src = ag.getSrcNode();
             double v = ag.getValue();
-            if (dest == -1 && !ag.isMoving()) {
+            if (dest == -1 ||!ag.isMoving()) {
                 dest = nextNode(ag);
                 game.chooseNextEdge(id, dest);
+                dt= (long) (250*(algo.getGraph().getEdge(src,dest).getWeight()/ag.getSpeed()));
+//                dt= (long) Math.max(60.0,dt); //need it?
+                System.out.println(dt);
+                slowest=ag;
+
                 //  System.out.println("Agent: " + id + ", val: " + v + "   turned to node: "
                 //        + dest +"time left for game: " + game.timeToEnd()/1000);
             }
+            else
+                System.out.println("called to fast");
 
         }
     }
@@ -159,9 +174,9 @@ public class Ex2 implements Runnable {
             if(ag.getSrcNode()==ag.getPathCompare().peek().getThePath().get(0).getKey())
             ag.getPathCompare().peek().getThePath().remove(0);
             node_data n = ag.getPathCompare().peek().getThePath().get(0);
-            if (ag.getPathCompare().peek().getThePath().size() == 1) {
-                ag.getPathCompare().remove(0);
-            }
+//            if (ag.getPathCompare().peek().getThePath().size() == 1) { //need it ?
+//                ag.getPathCompare().remove(0);
+//            }
             return n.getKey();
         }
         return -1;
@@ -194,6 +209,7 @@ public class Ex2 implements Runnable {
 
             ArrayList<CL_Pokemon> pokedex = (ArrayList<CL_Pokemon>) _ar.getPokemons();
             HashMap<Integer, HashSet<Integer>> egdes = new HashMap<Integer, HashSet<Integer>>();
+            HashSet freenode= new HashSet <Integer>(((DWGraph_DS) algo.getGraph()).gethashmap().keySet());
 
             for (int i = 0; i < pokedex.size(); i++) {
                 _ar.updateEdge(pokedex.get(i), _ar.getGraph());
@@ -209,11 +225,27 @@ public class Ex2 implements Runnable {
                         egdes.get(startNode).add(destNode);
                         game.addAgent(startNode);
                         game.chooseNextEdge(i, destNode);
+                        freenode.remove(startNode);
                     } else {
-
+                        int freen;
+                        if (freenode.size()>0) {
+                            freen = (int) freenode.iterator().next();
+                            freenode.remove(freen);
+                        }
+                        else
+                            freen=((DWGraph_DS) algo.getGraph()).gethashmap().keySet().iterator().next();
+                        game.addAgent(freen);
                     }
 
                 } else {
+                    int freen;
+                    if (freenode.size()>0) {
+                        freen = (int) freenode.iterator().next();
+                        freenode.remove(freen);
+                    }
+                    else
+                        freen=((DWGraph_DS) algo.getGraph()).gethashmap().keySet().iterator().next();
+                    game.addAgent(freen);
 
                 }
 
