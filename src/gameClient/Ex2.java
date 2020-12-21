@@ -39,7 +39,7 @@ public class Ex2 implements Runnable {
         int scenario_num = test.getlevel();
         game_service game = Game_Server_Ex2.getServer(scenario_num); // you have [0,23] games
         int id = test.getid();
-        //	game.login(id);
+        game.login(id);
         String g = game.getGraph();
         String pks = game.getPokemons();
         algo.loadfromstirng(g);
