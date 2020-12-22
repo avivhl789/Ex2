@@ -1,11 +1,15 @@
+import Server.Game_Server_Ex2;
 import api.directed_weighted_graph;
+import api.game_service;
 import api.node_data;
 import ex2.DWGraph_Algo;
 import ex2.DWGraph_DS;
 import ex2.nodedata;
+import gameClient.CL_Agent;
 import org.junit.jupiter.api.*;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -217,6 +221,30 @@ public class DWGraph_Algo_Tests
         }
         boolean actualAns = tester.isConnected();
         assert actualAns;
+    }
+
+    @Test
+    void clientShortestPath()
+    {
+        List<node_data> expectedList = new ArrayList<node_data>();
+        expectedList.add(graph.getNode(0));
+        expectedList.add(graph.getNode(1));
+        expectedList.add(graph.getNode(2));
+        expectedList.add(graph.getNode(3));
+        expectedList.add(graph.getNode(4));
+        expectedList.add(graph.getNode(7));
+        int expectedTotalWeight = 56;
+        CL_Agent.PathHelper expected = new CL_Agent.PathHelper(expectedTotalWeight,expectedList);
+        CL_Agent.PathHelper actual = tester.clientShortestPath(0,7);
+        assertEquals(expected.toString(),actual.toString());
+    }
+
+    @Test
+    void loadFromString()
+    {
+        game_service game = Game_Server_Ex2.getServer(14);
+        String jsonInputFromServer = game.getGraph();
+        assertTrue(tester.loadfromstirng(jsonInputFromServer));
     }
 
     private static Random _rnd = null;

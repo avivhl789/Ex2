@@ -286,6 +286,12 @@ public class CL_Agent {
                 return 1;
             return 0;
         }
+
+        @Override
+        public String toString()
+        {
+            return "the path list is: " +thePath +" , the total cost of the path is: " +totalCost;
+        }
     }
 }
 
