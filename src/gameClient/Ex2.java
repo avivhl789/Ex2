@@ -21,11 +21,19 @@ public class Ex2 implements Runnable {
     private static HashMap<Integer, HashMap<Integer, CL_Agent.PathHelper>> fullgrmaping = new HashMap<>();
     private static long dt = 100;
     private static CL_Agent slowest = new CL_Agent();
+    private static int id=-1;
+    public static int scenario_num;
 
 
     public static void main(String[] a) {
         EnterScreen gui = new EnterScreen();
         test = gui;
+        if(a.length != 0)
+        {
+            //TODO need to use set level and id
+            id = Integer.parseInt(a[0]);
+            scenario_num = Integer.parseInt(a[1]);
+        }
         while (!gui.getStartGame()) {
             System.out.print("");
         }
@@ -36,9 +44,10 @@ public class Ex2 implements Runnable {
 
     @Override
     public void run() {
-        int scenario_num = test.getlevel();
+        if (id==-1){
+        scenario_num = test.getlevel();
+        id = test.getid();}
         game_service game = Game_Server_Ex2.getServer(scenario_num); // you have [0,23] games
-        int id = test.getid();
         game.login(id);
         String g = game.getGraph();
         String pks = game.getPokemons();

@@ -54,7 +54,7 @@ public class EnterScreen extends JFrame implements ActionListener{
     public int getid()
     {
         if(textforid.getText().isBlank())
-            return 0;
+            return 319121158;
         try{
             int id=Integer.parseInt(textforid.getText());
             return  id;
