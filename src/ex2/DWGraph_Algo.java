@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+
 public class DWGraph_Algo implements dw_graph_algorithms {
     private directed_weighted_graph gr;
 
@@ -403,5 +404,47 @@ public class DWGraph_Algo implements dw_graph_algorithms {
         return null;
     }
 
+    public List<Integer> connected_component(int id1) {
+        HashSet <Integer>dfs = new HashSet();
+        HashSet<Integer> rdfs = new HashSet();
+        List<Integer> oder = new ArrayList<>();
+        oder.add(id1);
+        for (int i = 0; i < oder.size(); i++) {
+            if (!dfs.contains(oder.get(i))) {
+                dfs.add(oder.get(i));
+                HashMap<Integer, edge_data> temp = ((nodedata) gr.getNode(oder.get(i))).getNi();
+                for (int key:temp.keySet()) {
+                    oder.add(key);
+                }
+            }
+        }
+        oder.clear();
+        oder.add(id1);
+        for (int i = 0; i < oder.size(); i++) {
+            if (!rdfs.contains(oder.get(i))) {
+                rdfs.add(oder.get(i));
+                HashMap<Integer, edge_data> temp = ((nodedata) gr.getNode(oder.get(i))).getinedgeinfo();
+                for (int key:temp.keySet()) {
+                    oder.add(key);
+                }
+            }
+        }
+        oder.clear();
+        for (int key:dfs) {
+            if (rdfs.contains(key))
+                oder.add(key);
+        }
+        return oder;
+    }
+    public ArrayList<List<Integer>>  connected_components(){
+        ArrayList<List<Integer>> scc=new ArrayList<>();
+        HashMap<Integer, node_data> temp = ((DWGraph_DS) gr).gethashmap();
+        for (int key:temp.keySet()
+             ) {
+            scc.add(connected_component(key));
 
+
+        }
+        return scc;
+    }
 }

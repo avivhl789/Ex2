@@ -14,13 +14,15 @@ public  class nodedata implements node_data {
     private int Tag;
     private double Weight;
     private geo_location Location;
-    private HashMap<Integer, edge_data> edgeinfo;
+    private HashMap<Integer, edge_data> inedgeinfo;
+    private HashMap<Integer, edge_data> outedgeinfo;
+
     public nodedata() {
         this.Info="empty";
         Key=CounterForKey;
         CounterForKey++;
         Tag=0;
-        edgeinfo = new HashMap<>();
+        inedgeinfo = new HashMap<>();
         Location = new geolocation();
 
     }
@@ -30,22 +32,25 @@ public  class nodedata implements node_data {
         this.Tag=Tag;
         this.Weight = Weight;
         this.Location=Location;
-        edgeinfo = new HashMap<>();
-
+        inedgeinfo = new HashMap<>();
+        outedgeinfo = new HashMap<>();
     }
     public nodedata(int key,String Info,int tag) {
         this.Info=Info;
         this.Key=key;
         this.Tag=tag;
         Location=new geolocation();
-        edgeinfo = new HashMap<>();
+        inedgeinfo = new HashMap<>();
+        outedgeinfo = new HashMap<>();
+
     }
     public nodedata(int key) {
         this.Info="empty";
         this.Key=key;
         this.Tag=0;
         Location=new geolocation();
-        edgeinfo = new HashMap<>();
+        inedgeinfo = new HashMap<>();
+        outedgeinfo = new HashMap<>();
     }
 
     public static int getCounterForKey()
@@ -59,24 +64,45 @@ public  class nodedata implements node_data {
     }
 
     public boolean hasNi(int key) {
-        return (edgeinfo.containsKey(key) && key != this.getKey());
+        return (inedgeinfo.containsKey(key) && key != this.getKey());
     }
     public void addNi(node_data t, double w) {
         if(t!=null)
-            if(!edgeinfo.containsKey(t.getKey()) || edgeinfo.get(t.getKey()).getWeight() != w)
+            if(!inedgeinfo.containsKey(t.getKey()) || inedgeinfo.get(t.getKey()).getWeight() != w)
                 if(t.getKey()!=this.Key) {
                     edgedata temp= new edgedata(this.Key,t.getKey(),w);
-                    edgeinfo.put(t.getKey(), temp);
+                    inedgeinfo.put(t.getKey(), temp);
+                }
+    }
+    public void addin(node_data t, double w) {
+        if(t!=null)
+            if(!outedgeinfo.containsKey(t.getKey()) || outedgeinfo.get(t.getKey()).getWeight() != w)
+                if(t.getKey()!=this.Key) {
+                    edgedata temp= new edgedata(this.Key,t.getKey(),w);
+                    outedgeinfo.put(t.getKey(), temp);
                 }
     }
     public HashMap<Integer, edge_data> getNi() {
-        return edgeinfo;
+        return outedgeinfo;
     }
+
+    public HashMap<Integer, edge_data> getinedgeinfo() {
+        return inedgeinfo;
+    }
+
     public void removeNode(node_data node) {
         if(node!=null)
-            if(edgeinfo.containsKey(node.getKey()))
+            if(outedgeinfo.containsKey(node.getKey()))
                 if(node.getKey()!=this.Key) {
-                    edgeinfo.remove(node.getKey());
+                    outedgeinfo.remove(node.getKey());
+                }
+
+    }
+    public void removeinNode(node_data node) {
+        if(node!=null)
+            if(inedgeinfo.containsKey(node.getKey()))
+                if(node.getKey()!=this.Key) {
+                    inedgeinfo.remove(node.getKey());
                 }
 
     }
@@ -143,9 +169,9 @@ public  class nodedata implements node_data {
             return  false;
 
         }
-        for (Integer keyofedge: edgeinfo.keySet())
+        for (Integer keyofedge: inedgeinfo.keySet())
         {
-            edgedata currEdgeData = (edgedata) edgeinfo.get(keyofedge);
+            edgedata currEdgeData = (edgedata) inedgeinfo.get(keyofedge);
             edgedata compEdgeData = ((edgedata)(compNode.getNi()).get(keyofedge));
             if(!currEdgeData.equals(compEdgeData))
                 return false;

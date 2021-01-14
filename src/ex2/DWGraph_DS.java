@@ -53,11 +53,13 @@ public class DWGraph_DS implements directed_weighted_graph
                 modeCounter++;
                 edgeCounter++;
                 ((nodedata) graph.get(src)).addNi(graph.get(dest), w);
+                ((nodedata) graph.get(dest)).addin(graph.get(dest), w);
             }
             else if (getEdge(src, dest).getWeight() != w)
             {
                 modeCounter++;
                 ((nodedata) graph.get(src)).addNi(graph.get(dest), w);
+                ((nodedata) graph.get(dest)).addin(graph.get(dest), w);
             }
         }
     }
@@ -87,7 +89,10 @@ public class DWGraph_DS implements directed_weighted_graph
                 modeCounter += ((nodedata) graph.get(key)).getNi().size() + 1;
                 HashMap<Integer, edge_data> temp = ((nodedata) graph.get(key)).getNi();
                 temp.forEach((k, v) -> ((nodedata) graph.get(k)).removeNode(graph.get(key)));
+                temp = ((nodedata) graph.get(key)).getinedgeinfo();
+                temp.forEach((k, v) -> ((nodedata) graph.get(k)).removeinNode(graph.get(key)));
                 ((nodedata) graph.get(key)).getNi().clear();
+                ((nodedata) graph.get(key)).getinedgeinfo().clear();
                 return graph.remove(key);
             }
         return null;
